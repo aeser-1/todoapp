@@ -12,36 +12,36 @@ ___
 ---
 http://localhost:8080/listall
 
-![listall](\img\listall.jpg)
+![listall](img/listall.jpg)
 
 http://localhost:8080/listcategory
 
-![listcategory](\img\listcategory.jpg)
+![listcategory](img/listcategory.jpg)
 
 http://localhost:8080/getitem/:data
 
-![getitem](\img\getitem.jpg)
+![getitem](img/getitem.jpg)
 
 http://localhost:8080/additem/:data
 
-![additem](\img\additem.jpg)
+![additem](img/additem.jpg)
 
 http://localhost:8080/addcategory
 
-![addcategory](\img\addcategory.jpg)
+![addcategory](img/addcategory.jpg)
 
 http://localhost:8080/deletecategory/:data
 
-![deletecategory](\img\deletecategory.jpg)
+![deletecategory](img/deletecategory.jpg)
 
 http://localhost:8080/deleteitem/:data
 
-![deleteitem](\img\deleteitem.jpg)
+![deleteitem](img/deleteitem.jpg)
 
 http://localhost:8080/updateitem/:data
 
-![updateitem](\img\updateitem.jpg)
+![updateitem](img/updateitem.jpg)
 
 http://localhost:8080/jobdone/:data
 
-![jobdone](\img\jobdone.jpg)
+![jobdone](img/jobdone.jpg)
