@@ -5,7 +5,7 @@ Go Version go1.16.4
 MySQL
 [Echo v3.3.10](https://echo.labstack.com)
 
-MySQL settings are in dbconn.go file username:root password:pass123
+MySQL settings are in ````dbconn.go```` file ````username:root password:pass123````
 ___
 
 ### Endpoints
