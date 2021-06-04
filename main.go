@@ -88,7 +88,7 @@ func listAll(c echo.Context) error {
 
 	for i := 0; i < len(items); i++ {
 
-		_, _, day, _, _, _ := remainingDayCheck(items[i].CreatedTime.Time, items[i].Deadline.Time)
+		_, _, day, _, _, _ := remainingDayCheck(time.Now(), items[i].Deadline.Time)
 		//items[i].RemainingDay.Int64 = int64(day)
 		if items[i].Progress == "overdue" || items[i].Progress == "done" {
 			day = 0
@@ -101,52 +101,29 @@ func listAll(c echo.Context) error {
 		defer update.Close()
 
 		if items[i].Progress != "done" {
-			if items[i].UpdatedTime.Valid {
-				var newProgress string
 
-				progress := progressCheck(items[i].UpdatedTime.Time, items[i].Deadline.Time)
+			var newProgress string
 
-				select1, err := conn.Query("SELECT progress From todo.progress WHERE id=?", progress)
-				if err != nil {
-					panic(err.Error())
-				}
+			progress := progressCheck(time.Now(), items[i].Deadline.Time)
 
-				for select1.Next() {
-					err1 := select1.Scan(&newProgress)
-					if err1 != nil {
-						panic(err1)
-					}
-				}
-
-				update, err := conn.Query("UPDATE todo.todo SET progress=? WHERE id=?", newProgress, items[i].Id)
-				if err != nil {
-					panic(err.Error())
-				}
-				defer update.Close()
-
-			} else {
-				var newProgress string
-
-				progress := progressCheck(items[i].CreatedTime.Time, items[i].Deadline.Time)
-
-				select1, err := conn.Query("SELECT progress From todo.progress WHERE id=?", progress)
-				if err != nil {
-					panic(err.Error())
-				}
-
-				for select1.Next() {
-					err1 := select1.Scan(&newProgress)
-					if err1 != nil {
-						panic(err1)
-					}
-				}
-
-				update, err := conn.Query("UPDATE todo.todo SET progress=? WHERE id=?", newProgress, items[i].Id)
-				if err != nil {
-					panic(err.Error())
-				}
-				defer update.Close()
+			select1, err := conn.Query("SELECT progress From todo.progress WHERE id=?", progress)
+			if err != nil {
+				panic(err.Error())
 			}
+
+			for select1.Next() {
+				err1 := select1.Scan(&newProgress)
+				if err1 != nil {
+					panic(err1)
+				}
+			}
+
+			update, err := conn.Query("UPDATE todo.todo SET progress=? WHERE id=?", newProgress, items[i].Id)
+			if err != nil {
+				panic(err.Error())
+			}
+			defer update.Close()
+
 		}
 	}
 
