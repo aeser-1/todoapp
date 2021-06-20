@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -60,13 +61,13 @@ func listAll(c echo.Context) error {
 
 	select2, err := conn.Query("SELECT COUNT(*) From todo.todo")
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select2.Next() {
 		err1 := select2.Scan(&rowcount)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 	}
 
@@ -74,14 +75,14 @@ func listAll(c echo.Context) error {
 
 	select1, err := conn.Query("SELECT * From todo.todo")
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	counter := 0
 	for select1.Next() {
 		err1 := select1.Scan(&items[counter].Id, &items[counter].Title, &items[counter].Description, &items[counter].Category, &items[counter].Progress, &items[counter].Deadline, &items[counter].Status, &items[counter].CreatedTime, &items[counter].UpdatedTime, &items[counter].RemainingDay)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 		counter++
 	}
@@ -96,7 +97,7 @@ func listAll(c echo.Context) error {
 
 		update, err := conn.Query("UPDATE todo.todo SET remainingday=? WHERE id=?", int64(day), items[i].Id)
 		if err != nil {
-			panic(err.Error())
+			log.Fatalf("Error: %+v\n", err)
 		}
 		defer update.Close()
 
@@ -108,19 +109,19 @@ func listAll(c echo.Context) error {
 
 			select1, err := conn.Query("SELECT progress From todo.progress WHERE id=?", progress)
 			if err != nil {
-				panic(err.Error())
+				log.Fatalf("Error: %+v\n", err)
 			}
 
 			for select1.Next() {
 				err1 := select1.Scan(&newProgress)
 				if err1 != nil {
-					panic(err1)
+					log.Fatalf("Error: %+v\n", err1)
 				}
 			}
 
 			update, err := conn.Query("UPDATE todo.todo SET progress=? WHERE id=?", newProgress, items[i].Id)
 			if err != nil {
-				panic(err.Error())
+				log.Fatalf("Error: %+v\n", err)
 			}
 			defer update.Close()
 
@@ -129,14 +130,14 @@ func listAll(c echo.Context) error {
 
 	select2, err2 := conn.Query("SELECT * From todo.todo")
 	if err2 != nil {
-		panic(err2.Error())
+		log.Fatalf("Error: %+v\n", err2)
 	}
 
 	counter = 0
 	for select2.Next() {
 		err1 := select2.Scan(&items[counter].Id, &items[counter].Title, &items[counter].Description, &items[counter].Category, &items[counter].Progress, &items[counter].Deadline, &items[counter].Status, &items[counter].CreatedTime, &items[counter].UpdatedTime, &items[counter].RemainingDay)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 		counter++
 	}
@@ -154,13 +155,13 @@ func getItem(c echo.Context) error {
 
 	select1, err := conn.Query("SELECT * From todo.todo WHERE id=?", id)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select1.Next() {
 		err1 := select1.Scan(&item.Id, &item.Title, &item.Description, &item.Category, &item.Progress, &item.Deadline, &item.Status, &item.CreatedTime, &item.UpdatedTime, &item.RemainingDay)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 	}
 
@@ -200,13 +201,13 @@ func addItem(c echo.Context) error {
 
 	select1, err := conn.Query("SELECT progress From todo.progress WHERE id=?", progress)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select1.Next() {
 		err1 := select1.Scan(&item.Progress)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 	}
 
@@ -216,13 +217,13 @@ func addItem(c echo.Context) error {
 
 		select1, err := conn.Query("SELECT status From todo.status WHERE id=2")
 		if err != nil {
-			panic(err.Error())
+			log.Fatalf("Error: %+v\n", err)
 		}
 
 		for select1.Next() {
 			err1 := select1.Scan(&item.Status)
 			if err1 != nil {
-				panic(err1)
+				log.Fatalf("Error: %+v\n", err)
 			}
 		}
 
@@ -232,20 +233,20 @@ func addItem(c echo.Context) error {
 
 		select1, err := conn.Query("SELECT status From todo.status WHERE id=1")
 		if err != nil {
-			panic(err.Error())
+			log.Fatalf("Error: %+v\n", err)
 		}
 
 		for select1.Next() {
 			err1 := select1.Scan(&item.Status)
 			if err1 != nil {
-				panic(err1)
+				log.Fatalf("Error: %+v\n", err1)
 			}
 		}
 	}
 
 	insert1, err := conn.Query("INSERT INTO todo.todo (title,description,category,progress,status,deadline,createdtime,remainingday) VALUES(?,?,?,?,?,?,?,?)", item.Title, item.Description, item.Category, item.Progress, item.Status, item.Deadline.Time, item.CreatedTime.Time, item.RemainingDay.Int64)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 	defer insert1.Close()
 
@@ -260,7 +261,7 @@ func deleteItem(c echo.Context) error {
 
 	_, err := conn.Query("DELETE FROM todo.todo WHERE id=?", id)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	return c.String(http.StatusOK, "Item Deleted.")
@@ -285,7 +286,7 @@ func addCategory(c echo.Context) error {
 
 	insert1, err := conn.Query("INSERT INTO todo.category (category) VALUES(?)", category.Category)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 	defer insert1.Close()
 
@@ -300,7 +301,7 @@ func deleteCategory(c echo.Context) error {
 
 	_, err := conn.Query("DELETE FROM todo.category WHERE id=?", id)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	return c.String(http.StatusOK, "Category Deleted.")
@@ -314,13 +315,13 @@ func listCategory(c echo.Context) error {
 
 	select2, err := conn.Query("SELECT COUNT(*) From todo.category")
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select2.Next() {
 		err1 := select2.Scan(&rowcount)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err)
 		}
 	}
 
@@ -328,14 +329,14 @@ func listCategory(c echo.Context) error {
 
 	select1, err := conn.Query("SELECT * From todo.category")
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	counter := 0
 	for select1.Next() {
 		err1 := select1.Scan(&categories[counter].Id, &categories[counter].Category)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 		counter++
 	}
@@ -372,13 +373,13 @@ func updateItem(c echo.Context) error {
 
 		select1, err := conn.Query("SELECT status From todo.status WHERE id=2")
 		if err != nil {
-			panic(err.Error())
+			log.Fatalf("Error: %+v\n", err)
 		}
 
 		for select1.Next() {
 			err1 := select1.Scan(&item.Status)
 			if err1 != nil {
-				panic(err1)
+				log.Fatalf("Error: %+v\n", err1)
 			}
 		}
 
@@ -388,13 +389,13 @@ func updateItem(c echo.Context) error {
 
 		select1, err := conn.Query("SELECT status From todo.status WHERE id=1")
 		if err != nil {
-			panic(err.Error())
+			log.Fatalf("Error: %+v\n", err)
 		}
 
 		for select1.Next() {
 			err1 := select1.Scan(&item.Status)
 			if err1 != nil {
-				panic(err1)
+				log.Fatalf("Error: %+v\n", err1)
 			}
 		}
 	}
@@ -405,25 +406,25 @@ func updateItem(c echo.Context) error {
 
 	select1, err := conn.Query("SELECT progress From todo.progress WHERE id=?", progress)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select1.Next() {
 		err1 := select1.Scan(&newProgress)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 	}
 
 	update, err := conn.Query("UPDATE todo.todo SET progress=? WHERE id=?", newProgress, item.Id)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 	defer update.Close()
 
 	update1, err1 := conn.Query("UPDATE todo.todo SET title=?, description=?, category=?, deadline=?, updatedtime=? ,status=? WHERE id=?", item.Title, item.Description, item.Category, item.Deadline.Time, item.UpdatedTime.Time, item.Status, item.Id)
 	if err1 != nil {
-		panic(err1.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 	defer update1.Close()
 
@@ -444,13 +445,13 @@ func categoryCheck(catid int) string {
 
 	select1, err := conn.Query("SELECT category From todo.category WHERE id=?", catid)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select1.Next() {
 		err1 := select1.Scan(&category)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err)
 		}
 	}
 	return category
@@ -525,19 +526,19 @@ func jobDone(c echo.Context) error {
 
 	select1, err := conn.Query("SELECT progress From todo.progress WHERE id=2")
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 
 	for select1.Next() {
 		err1 := select1.Scan(&progress)
 		if err1 != nil {
-			panic(err1)
+			log.Fatalf("Error: %+v\n", err1)
 		}
 	}
 
 	update, err := conn.Query("UPDATE todo.todo SET progress=? WHERE id=?", progress, id)
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("Error: %+v\n", err)
 	}
 	defer update.Close()
 
