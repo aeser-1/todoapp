@@ -33,6 +33,15 @@ type Category struct {
 	Category string `json:"category"`
 }
 
+type RemainingTime struct {
+	Year  int `json:"year"`
+	Month int `json:"month"`
+	Day   int `json:"day"`
+	Hour  int `json:"hour"`
+	Min   int `json:"min"`
+	Sec   int `json:"sec"`
+}
+
 func main() {
 
 	e := echo.New()
@@ -50,7 +59,6 @@ func main() {
 	e.PUT("/jobdone/:data", jobDone)
 
 	e.Start(":8080")
-
 }
 
 func listAll(c echo.Context) error {
@@ -89,13 +97,13 @@ func listAll(c echo.Context) error {
 
 	for i := 0; i < len(items); i++ {
 
-		_, _, day, _, _, _ := remainingDayCheck(time.Now(), items[i].Deadline.Time)
+		remainingtime := remainingDayCheck(time.Now(), items[i].Deadline.Time)
 		//items[i].RemainingDay.Int64 = int64(day)
 		if items[i].Progress == "overdue" || items[i].Progress == "done" {
-			day = 0
+			remainingtime.Day = 0
 		}
 
-		update, err := conn.Query("UPDATE todo.todo SET remainingday=? WHERE id=?", int64(day), items[i].Id)
+		update, err := conn.Query("UPDATE todo.todo SET remainingday=? WHERE id=?", int64(remainingtime.Day), items[i].Id)
 		if err != nil {
 			log.Fatalf("Error: %+v\n", err)
 		}
@@ -190,8 +198,8 @@ func addItem(c echo.Context) error {
 
 	progress := progressCheck(item.CreatedTime.Time, item.Deadline.Time)
 
-	_, _, day, _, _, _ := remainingDayCheck(item.CreatedTime.Time, item.Deadline.Time)
-	item.RemainingDay.Int64 = int64(day)
+	remainingtime := remainingDayCheck(item.CreatedTime.Time, item.Deadline.Time)
+	item.RemainingDay.Int64 = int64(remainingtime.Day)
 	if progress == 2|3 {
 		item.RemainingDay.Int64 = 0
 	}
@@ -470,7 +478,11 @@ func progressCheck(createdTime time.Time, deadline time.Time) int {
 	return 0
 }
 
-func remainingDayCheck(a, b time.Time) (year, month, day, hour, min, sec int) {
+func remainingDayCheck(a, b time.Time) RemainingTime {
+
+	var year, month, day, hour, min, sec int
+	remainingtime := RemainingTime{}
+
 	if a.Location() != b.Location() {
 		b = b.In(a.Location())
 	}
@@ -513,7 +525,14 @@ func remainingDayCheck(a, b time.Time) (year, month, day, hour, min, sec int) {
 		year--
 	}
 
-	return
+	remainingtime.Year = year
+	remainingtime.Month = month
+	remainingtime.Day = day
+	remainingtime.Hour = hour
+	remainingtime.Min = min
+	remainingtime.Sec = sec
+
+	return remainingtime
 }
 
 func jobDone(c echo.Context) error {
